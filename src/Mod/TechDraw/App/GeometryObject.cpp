@@ -43,6 +43,14 @@
 #include <HLRBRep_Algo.hxx>
 #include <HLRBRep_HLRToShape.hxx>
 #include <HLRAlgo_Projector.hxx>
+
+
+#include <BRepMesh_IncrementalMesh.hxx>
+#include <HLRBRep_PolyAlgo.hxx>
+#include <HLRBRep_PolyHLRToShape.hxx>
+#include <Poly_Triangulation.hxx>
+#include <TopLoc_Location.hxx>
+
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Vertex.hxx>
@@ -83,7 +91,9 @@ GeometryObject::GeometryObject(const string& parent, TechDraw::DrawView* parentO
     m_parent(parentObj),
     m_isoCount(0),
     m_isPersp(false),
-    m_focus(100.0)
+    m_focus(100.0),
+    m_useFastHLR(false)
+
 {
 }
 
@@ -157,20 +167,41 @@ void GeometryObject::projectShape(const TopoDS_Shape& input,
     auto start = chrono::high_resolution_clock::now();
 
     Handle(HLRBRep_Algo) brep_hlr = NULL;
+    Handle(HLRBRep_PolyAlgo) brep_hlrPoly = NULL;
+
     try {
-        brep_hlr = new HLRBRep_Algo();
-        brep_hlr->Add(input, m_isoCount);
-        if (m_isPersp) {
-            double fLength = std::max(Precision::Confusion(),m_focus);
-            HLRAlgo_Projector projector( viewAxis, fLength );
-            brep_hlr->Projector(projector);
-        } else {
-            HLRAlgo_Projector projector( viewAxis );
-            brep_hlr->Projector(projector);
+        if (m_useFastHLR) { //Fast hlr algo 
+            brep_hlrPoly = new HLRBRep_PolyAlgo();
+            brep_hlrPoly->Load(input);
+            //if (m_isPersp) {
+            //    double fLength = std::max(Precision::Confusion(), m_focus);
+            //    HLRAlgo_Projector projector(viewAxis, fLength);
+            //    brep_hlrPoly->Projector(projector);
+            //}
+            //else { // non perspective
+                HLRAlgo_Projector projector(viewAxis);
+                brep_hlrPoly->Projector(projector);
+            //}
+            brep_hlrPoly->Update();
+            //brep_hlr->Hide();                        
         }
-        brep_hlr->Update();
-        brep_hlr->Hide();                           //XXXX: what happens if we don't call Hide()?? and only look at VCompound?
-                                                    // WF: you get back all the edges in the shape, but very fast!!
+        else{ // Exact HLR algo
+            brep_hlr = new HLRBRep_Algo();
+            brep_hlr->Add(input, m_isoCount);
+
+            if (m_isPersp) {
+                double fLength = std::max(Precision::Confusion(), m_focus);
+                HLRAlgo_Projector projector(viewAxis, fLength);
+                brep_hlr->Projector(projector);
+            }
+            else { // non perspective
+                HLRAlgo_Projector projector(viewAxis);
+                brep_hlr->Projector(projector);
+            }
+            brep_hlr->Update();
+            brep_hlr->Hide();                           //XXXX: what happens if we don't call Hide()?? and only look at VCompound?
+            // WF: you get back all the edges in the shape, but very fast!!
+        }
     }
     catch (...) {
         Standard_Failure::Raise("GeometryObject::projectShape - error occurred while projecting shape");

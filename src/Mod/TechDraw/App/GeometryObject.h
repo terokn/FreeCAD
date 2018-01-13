@@ -100,6 +100,8 @@ public:
     void setParentName(std::string n);                          //for debug messages
     void isPerspective(bool b) { m_isPersp = b; }
     bool isPerspective(void) { return m_isPersp; }
+    void useFastHLR(bool b) { m_useFastHLR = b; }
+    bool useFastHLR(void) { return m_useFastHLR; }
     void setFocus(double f) { m_focus = f; }
     double getFocus(void) { return m_focus; }
     void pruneVertexGeom(Base::Vector3d center, double radius);
@@ -150,6 +152,7 @@ protected:
     int m_isoCount;
     bool m_isPersp;
     double m_focus;
+    bool m_useFastHLR;
 };
 
 } //namespace TechDrawGeometry

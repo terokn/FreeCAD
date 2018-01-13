@@ -87,6 +87,8 @@ public:
     App::PropertyBool         Perspective;
     App::PropertyDistance     Focus;
 
+    App::PropertyBool   FastHiddenLines;
+
     App::PropertyBool   SeamVisible;
     App::PropertyBool   SmoothVisible;
     //App::PropertyBool   OutlinesVisible;

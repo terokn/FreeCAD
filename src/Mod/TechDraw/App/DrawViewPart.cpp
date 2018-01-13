@@ -135,6 +135,7 @@ DrawViewPart::DrawViewPart(void) : geometryObject(0)
 
     //properties that affect Appearance
     //visible outline
+    ADD_PROPERTY_TYPE(FastHiddenLines, (false), sgroup, App::Prop_None, "Faster Hidden line Algorithm on/off");
     ADD_PROPERTY_TYPE(SmoothVisible ,(false),sgroup,App::Prop_None,"Visible Smooth lines on/off");
     ADD_PROPERTY_TYPE(SeamVisible ,(false),sgroup,App::Prop_None,"Visible Seam lines on/off");
     ADD_PROPERTY_TYPE(IsoVisible ,(false),sgroup,App::Prop_None,"Visible Iso u,v lines on/off");
@@ -332,6 +333,7 @@ TechDrawGeometry::GeometryObject* DrawViewPart::buildGeometryObject(TopoDS_Shape
     go->setIsoCount(IsoCount.getValue());
     go->isPerspective(Perspective.getValue());
     go->setFocus(Focus.getValue());
+    go->useFastHLR(FastHiddenLines.getValue());
 
     Base::Vector3d baseProjDir = Direction.getValue();
     saveParamSpace(baseProjDir);
