@@ -322,7 +322,7 @@ short DrawViewPart::mustExecute() const
 void DrawViewPart::onChanged(const App::Property* prop)
 {
     DrawView::onChanged(prop);
-
+    
 //TODO: when scale changes, any Dimensions for this View sb recalculated.  DVD should pick this up subject to topological naming issues.
 }
 

@@ -168,9 +168,28 @@ void GeometryObject::projectShape(const TopoDS_Shape& input,
 
     Handle(HLRBRep_Algo) brep_hlr = NULL;
     Handle(HLRBRep_PolyAlgo) brep_hlrPoly = NULL;
-
+    //qDebug("qDebug autocreates a newline and works with variables %d", 5);
+    
     try {
         if (m_useFastHLR) { //Fast hlr algo 
+            TopExp_Explorer faces(input, TopAbs_FACE);
+            for (int i = 1; faces.More(); faces.Next(), i++) {
+                const TopoDS_Face& f = TopoDS::Face(faces.Current());
+                if (!f.IsNull()) {
+                    BRepMesh_IncrementalMesh(f, 0.10);
+                    TopLoc_Location location;
+                    Handle_Poly_Triangulation triangulation = BRep_Tool::Triangulation(f, location);
+                    if (triangulation) {
+                        long int triCount = triangulation->NbNodes();
+                        Base::Console().Message("TRACE - GO::projectShape - face: %d triangles: %ld\n", i, triCount);
+                    }
+                    else {
+                        Base::Console().Message("TRACE - GO::projectShape - face: %d NO triangles\n");
+                    }
+                }
+            }
+            
+            Base::Console().Warning("Line  %d in %s \n", __LINE__,__FILE__);
             brep_hlrPoly = new HLRBRep_PolyAlgo();
             brep_hlrPoly->Load(input);
             //if (m_isPersp) {
@@ -181,8 +200,10 @@ void GeometryObject::projectShape(const TopoDS_Shape& input,
             //else { // non perspective
                 HLRAlgo_Projector projector(viewAxis);
                 brep_hlrPoly->Projector(projector);
-            //}
+                //}
+                
             brep_hlrPoly->Update();
+            Base::Console().Warning("Line  %d in %s \n", __LINE__, __FILE__);
             //brep_hlr->Hide();                        
         }
         else{ // Exact HLR algo
@@ -212,32 +233,54 @@ void GeometryObject::projectShape(const TopoDS_Shape& input,
     Base::Console().Log("TIMING - %s GO spent: %.3f millisecs in HLRBRep_Algo & co\n",m_parentName.c_str(),diffOut);
 
     try {
-        HLRBRep_HLRToShape hlrToShape(brep_hlr);
+        if (m_useFastHLR){
+            HLRBRep_PolyHLRToShape polyhlrToShape = HLRBRep_PolyHLRToShape();
+            
+            visHard = polyhlrToShape.VCompound();
+            visSmooth = polyhlrToShape.Rg1LineVCompound();
+            visSeam = polyhlrToShape.RgNLineVCompound();
+            visOutline = polyhlrToShape.OutLineVCompound();
+            //visIso = polyhlrToShape.IsoLineVCompound();
+            hidHard = polyhlrToShape.HCompound();
+            hidSmooth = polyhlrToShape.Rg1LineHCompound();
+            hidSeam = polyhlrToShape.RgNLineHCompound();
+            hidOutline = polyhlrToShape.OutLineHCompound();
+            //hidIso = polyhlrToShape.IsoLineHCompound();
+        }
+        else{
+            HLRBRep_HLRToShape hlrToShape(brep_hlr);
+            visHard = hlrToShape.VCompound();
+            visSmooth = hlrToShape.Rg1LineVCompound();
+            visSeam = hlrToShape.RgNLineVCompound();
+            visOutline = hlrToShape.OutLineVCompound();
+            visIso = hlrToShape.IsoLineVCompound();
+            hidHard = hlrToShape.HCompound();
+            hidSmooth = hlrToShape.Rg1LineHCompound();
+            hidSeam = hlrToShape.RgNLineHCompound();
+            hidOutline = hlrToShape.OutLineHCompound();
+            hidIso = hlrToShape.IsoLineHCompound();
 
-        visHard    = hlrToShape.VCompound();
-        visSmooth  = hlrToShape.Rg1LineVCompound();
-        visSeam    = hlrToShape.RgNLineVCompound();
-        visOutline = hlrToShape.OutLineVCompound();
-        visIso     = hlrToShape.IsoLineVCompound();
-        hidHard    = hlrToShape.HCompound();
-        hidSmooth  = hlrToShape.Rg1LineHCompound();
-        hidSeam    = hlrToShape.RgNLineHCompound();
-        hidOutline = hlrToShape.OutLineHCompound();
-        hidIso     = hlrToShape.IsoLineHCompound();
+        }
+
 
 //need these 3d curves to prevent "zero edges" later
         BRepLib::BuildCurves3d(visHard);
         BRepLib::BuildCurves3d(visSmooth);
         BRepLib::BuildCurves3d(visSeam);
         BRepLib::BuildCurves3d(visOutline);
-        BRepLib::BuildCurves3d(visIso);
+       // BRepLib::BuildCurves3d(visIso);
         BRepLib::BuildCurves3d(hidHard);
         BRepLib::BuildCurves3d(hidSmooth);
         BRepLib::BuildCurves3d(hidSeam);
         BRepLib::BuildCurves3d(hidOutline);
-        BRepLib::BuildCurves3d(hidIso);
+       // BRepLib::BuildCurves3d(hidIso);
     }
-    catch (...) {
+    catch (Standard_Failure f) {
+        
+        //ACCESS VIOLATION at address 0x00000010 during 'READ' operation
+        Base::Console().Message("Standar failure: %s", f.GetMessageString());
+        
+
         Standard_Failure::Raise("GeometryObject::projectShape - error occurred while extracting edges");
     }
 
