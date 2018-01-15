@@ -200,10 +200,9 @@ void GeometryObject::projectShape(const TopoDS_Shape& input,
             //else { // non perspective
                 HLRAlgo_Projector projector(viewAxis);
                 brep_hlrPoly->Projector(projector);
-                //}
+            //}
                 
             brep_hlrPoly->Update();
-            Base::Console().Warning("Line  %d in %s \n", __LINE__, __FILE__);
             //brep_hlr->Hide();                        
         }
         else{ // Exact HLR algo
@@ -235,7 +234,8 @@ void GeometryObject::projectShape(const TopoDS_Shape& input,
     try {
         if (m_useFastHLR){
             HLRBRep_PolyHLRToShape polyhlrToShape = HLRBRep_PolyHLRToShape();
-            
+            polyhlrToShape.Update(brep_hlrPoly);
+
             visHard = polyhlrToShape.VCompound();
             visSmooth = polyhlrToShape.Rg1LineVCompound();
             visSeam = polyhlrToShape.RgNLineVCompound();
@@ -275,12 +275,8 @@ void GeometryObject::projectShape(const TopoDS_Shape& input,
         BRepLib::BuildCurves3d(hidOutline);
        // BRepLib::BuildCurves3d(hidIso);
     }
-    catch (Standard_Failure f) {
+    catch (...) {
         
-        //ACCESS VIOLATION at address 0x00000010 during 'READ' operation
-        Base::Console().Message("Standar failure: %s", f.GetMessageString());
-        
-
         Standard_Failure::Raise("GeometryObject::projectShape - error occurred while extracting edges");
     }
 
