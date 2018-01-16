@@ -159,128 +159,169 @@ void GeometryObject::clear()
 
 //!set up a hidden line remover and project a shape with it
 void GeometryObject::projectShape(const TopoDS_Shape& input,
-                                  const gp_Ax2 viewAxis)
+    const gp_Ax2 viewAxis)
 {
+    m_useFastHLR = true; //FORCE FOR TESTING!
+    if (m_useFastHLR)
+        return projectShapeWithPolygonAlgo(input, viewAxis);
+
     // Clear previous Geometry
     clear();
 
     auto start = chrono::high_resolution_clock::now();
 
     Handle(HLRBRep_Algo) brep_hlr = NULL;
-    Handle(HLRBRep_PolyAlgo) brep_hlrPoly = NULL;
     //qDebug("qDebug autocreates a newline and works with variables %d", 5);
-    
-    try {
-        if (m_useFastHLR) { //Fast hlr algo 
-            TopExp_Explorer faces(input, TopAbs_FACE);
-            for (int i = 1; faces.More(); faces.Next(), i++) {
-                const TopoDS_Face& f = TopoDS::Face(faces.Current());
-                if (!f.IsNull()) {
-                    BRepMesh_IncrementalMesh(f, 0.10);
-                    TopLoc_Location location;
-                    Handle_Poly_Triangulation triangulation = BRep_Tool::Triangulation(f, location);
-                    if (triangulation) {
-                        long int triCount = triangulation->NbNodes();
-                        Base::Console().Message("TRACE - GO::projectShape - face: %d triangles: %ld\n", i, triCount);
-                    }
-                    else {
-                        Base::Console().Message("TRACE - GO::projectShape - face: %d NO triangles\n");
-                    }
-                }
-            }
-            
-            Base::Console().Warning("Line  %d in %s \n", __LINE__,__FILE__);
-            brep_hlrPoly = new HLRBRep_PolyAlgo();
-            brep_hlrPoly->Load(input);
-            //if (m_isPersp) {
-            //    double fLength = std::max(Precision::Confusion(), m_focus);
-            //    HLRAlgo_Projector projector(viewAxis, fLength);
-            //    brep_hlrPoly->Projector(projector);
-            //}
-            //else { // non perspective
-                HLRAlgo_Projector projector(viewAxis);
-                brep_hlrPoly->Projector(projector);
-            //}
-                
-            brep_hlrPoly->Update();
-            //brep_hlr->Hide();                        
-        }
-        else{ // Exact HLR algo
-            brep_hlr = new HLRBRep_Algo();
-            brep_hlr->Add(input, m_isoCount);
 
-            if (m_isPersp) {
-                double fLength = std::max(Precision::Confusion(), m_focus);
-                HLRAlgo_Projector projector(viewAxis, fLength);
-                brep_hlr->Projector(projector);
-            }
-            else { // non perspective
-                HLRAlgo_Projector projector(viewAxis);
-                brep_hlr->Projector(projector);
-            }
-            brep_hlr->Update();
-            brep_hlr->Hide();                           //XXXX: what happens if we don't call Hide()?? and only look at VCompound?
-            // WF: you get back all the edges in the shape, but very fast!!
+    try {
+        brep_hlr = new HLRBRep_Algo();
+        brep_hlr->Add(input, m_isoCount);
+
+        if (m_isPersp) {
+            double fLength = std::max(Precision::Confusion(), m_focus);
+            HLRAlgo_Projector projector(viewAxis, fLength);
+            brep_hlr->Projector(projector);
         }
+        else { // non perspective
+            HLRAlgo_Projector projector(viewAxis);
+            brep_hlr->Projector(projector);
+        }
+        brep_hlr->Update();
+        brep_hlr->Hide();                           //XXXX: what happens if we don't call Hide()?? and only look at VCompound?
+        // WF: you get back all the edges in the shape, but very fast!!
     }
     catch (...) {
+
         Standard_Failure::Raise("GeometryObject::projectShape - error occurred while projecting shape");
     }
-    auto end   = chrono::high_resolution_clock::now();
-    auto diff  = end - start;
-    double diffOut = chrono::duration <double, milli> (diff).count();
-    Base::Console().Log("TIMING - %s GO spent: %.3f millisecs in HLRBRep_Algo & co\n",m_parentName.c_str(),diffOut);
+
+    auto end = chrono::high_resolution_clock::now();
+    auto diff = end - start;
+    double diffOut = chrono::duration <double, milli>(diff).count();
+    Base::Console().Log("TIMING - %s GO spent: %.3f millisecs in HLRBRep_Algo & co\n", m_parentName.c_str(), diffOut);
 
     try {
-        if (m_useFastHLR){
-            HLRBRep_PolyHLRToShape polyhlrToShape = HLRBRep_PolyHLRToShape();
-            polyhlrToShape.Update(brep_hlrPoly);
+        HLRBRep_HLRToShape hlrToShape(brep_hlr);
+        visHard = hlrToShape.VCompound();
+        visSmooth = hlrToShape.Rg1LineVCompound();
+        visSeam = hlrToShape.RgNLineVCompound();
+        visOutline = hlrToShape.OutLineVCompound();
+        visIso = hlrToShape.IsoLineVCompound();
+        hidHard = hlrToShape.HCompound();
+        hidSmooth = hlrToShape.Rg1LineHCompound();
+        hidSeam = hlrToShape.RgNLineHCompound();
+        hidOutline = hlrToShape.OutLineHCompound();
+        hidIso = hlrToShape.IsoLineHCompound();
 
-            visHard = polyhlrToShape.VCompound();
-            visSmooth = polyhlrToShape.Rg1LineVCompound();
-            visSeam = polyhlrToShape.RgNLineVCompound();
-            visOutline = polyhlrToShape.OutLineVCompound();
-            //visIso = polyhlrToShape.IsoLineVCompound();
-            hidHard = polyhlrToShape.HCompound();
-            hidSmooth = polyhlrToShape.Rg1LineHCompound();
-            hidSeam = polyhlrToShape.RgNLineHCompound();
-            hidOutline = polyhlrToShape.OutLineHCompound();
-            //hidIso = polyhlrToShape.IsoLineHCompound();
-        }
-        else{
-            HLRBRep_HLRToShape hlrToShape(brep_hlr);
-            visHard = hlrToShape.VCompound();
-            visSmooth = hlrToShape.Rg1LineVCompound();
-            visSeam = hlrToShape.RgNLineVCompound();
-            visOutline = hlrToShape.OutLineVCompound();
-            visIso = hlrToShape.IsoLineVCompound();
-            hidHard = hlrToShape.HCompound();
-            hidSmooth = hlrToShape.Rg1LineHCompound();
-            hidSeam = hlrToShape.RgNLineHCompound();
-            hidOutline = hlrToShape.OutLineHCompound();
-            hidIso = hlrToShape.IsoLineHCompound();
-
-        }
-
-
-//need these 3d curves to prevent "zero edges" later
+        //need these 3d curves to prevent "zero edges" later
         BRepLib::BuildCurves3d(visHard);
         BRepLib::BuildCurves3d(visSmooth);
         BRepLib::BuildCurves3d(visSeam);
         BRepLib::BuildCurves3d(visOutline);
-       // BRepLib::BuildCurves3d(visIso);
+        // BRepLib::BuildCurves3d(visIso);
         BRepLib::BuildCurves3d(hidHard);
         BRepLib::BuildCurves3d(hidSmooth);
         BRepLib::BuildCurves3d(hidSeam);
         BRepLib::BuildCurves3d(hidOutline);
-       // BRepLib::BuildCurves3d(hidIso);
+        // BRepLib::BuildCurves3d(hidIso);
     }
     catch (...) {
-        
+
         Standard_Failure::Raise("GeometryObject::projectShape - error occurred while extracting edges");
     }
 
 }
+
+//!set up a hidden line remover and project a shape with it
+void GeometryObject::projectShapeWithPolygonAlgo(const TopoDS_Shape& input,
+    const gp_Ax2 viewAxis)
+{
+    // Clear previous Geometry
+    clear();
+
+    auto start = chrono::high_resolution_clock::now();
+
+    Handle(HLRBRep_PolyAlgo) brep_hlrPoly = NULL;
+    //qDebug("qDebug autocreates a newline and works with variables %d", 5);
+
+    try {
+        TopExp_Explorer faces(input, TopAbs_FACE);
+        for (int i = 1; faces.More(); faces.Next(), i++) {
+            const TopoDS_Face& f = TopoDS::Face(faces.Current());
+            if (!f.IsNull()) {
+                BRepMesh_IncrementalMesh(f, 0.10);
+                TopLoc_Location location;
+                Handle_Poly_Triangulation triangulation = BRep_Tool::Triangulation(f, location);
+                if (triangulation) {
+                    long int triCount = triangulation->NbNodes();
+                    Base::Console().Message("TRACE - GO::projectShapeWithPolygonAlgo - face: %d triangles: %ld\n", i, triCount);
+                }
+                else {
+                    Base::Console().Message("TRACE - GO::projectShapeWithPolygonAlgo - face: %d NO triangles\n");
+                }
+            }
+        }
+
+        //    Base::Console().Warning("Line  %d in %s \n", __LINE__, __FILE__);
+        brep_hlrPoly = new HLRBRep_PolyAlgo();
+        brep_hlrPoly->Load(input);
+        if (m_isPersp) {
+            double fLength = std::max(Precision::Confusion(), m_focus);
+            HLRAlgo_Projector projector(viewAxis, fLength);
+            brep_hlrPoly->Projector(projector);
+        }
+        else { // non perspective
+            HLRAlgo_Projector projector(viewAxis);
+            brep_hlrPoly->Projector(projector);
+        }
+
+        brep_hlrPoly->Update();
+        //brep_hlr->Hide();                        
+    }
+    catch (...) {
+        Standard_Failure::Raise("GeometryObject::projectShape - error occurred while projecting shape");
+    }
+    auto end = chrono::high_resolution_clock::now();
+    auto diff = end - start;
+    double diffOut = chrono::duration <double, milli>(diff).count();
+    Base::Console().Log("TIMING - %s GO spent: %.3f millisecs in HLRBRep_PolyAlgo & co\n", m_parentName.c_str(), diffOut);
+
+    try {
+        HLRBRep_PolyHLRToShape polyhlrToShape = HLRBRep_PolyHLRToShape();
+        polyhlrToShape.Update(brep_hlrPoly);
+
+        visHard = polyhlrToShape.VCompound();
+        visSmooth = polyhlrToShape.Rg1LineVCompound();
+        visSeam = polyhlrToShape.RgNLineVCompound();
+        visOutline = polyhlrToShape.OutLineVCompound();
+        //visIso = polyhlrToShape.IsoLineVCompound();
+        hidHard = polyhlrToShape.HCompound();
+        hidSmooth = polyhlrToShape.Rg1LineHCompound();
+        hidSeam = polyhlrToShape.RgNLineHCompound();
+        hidOutline = polyhlrToShape.OutLineHCompound();
+        //hidIso = polyhlrToShape.IsoLineHCompound();
+
+
+
+        //need these 3d curves to prevent "zero edges" later
+        BRepLib::BuildCurves3d(visHard);
+        BRepLib::BuildCurves3d(visSmooth);
+        BRepLib::BuildCurves3d(visSeam);
+        BRepLib::BuildCurves3d(visOutline);
+        // BRepLib::BuildCurves3d(visIso);
+        BRepLib::BuildCurves3d(hidHard);
+        BRepLib::BuildCurves3d(hidSmooth);
+        BRepLib::BuildCurves3d(hidSeam);
+        BRepLib::BuildCurves3d(hidOutline);
+        // BRepLib::BuildCurves3d(hidIso);
+    }
+    catch (...) {
+
+        Standard_Failure::Raise("GeometryObject::projectShapeWithPolygonAlgo - error occurred while extracting edges");
+    }
+
+}
+
 
 //!add edges meeting filter criteria for category, visibility
 void GeometryObject::extractGeometry(edgeClass category, bool visible)

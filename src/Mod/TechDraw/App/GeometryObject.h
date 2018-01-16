@@ -91,8 +91,10 @@ public:
     const std::vector<Face *>     & getFaceGeometry() const { return faceGeom; };
 
     void projectShape(const TopoDS_Shape &input,
-                      const gp_Ax2 viewAxis);
-
+        const gp_Ax2 viewAxis);
+    void projectShapeWithPolygonAlgo(const TopoDS_Shape &input,
+        const gp_Ax2 viewAxis);
+    
     void extractGeometry(edgeClass category, bool visible);
     void addFaceGeom(Face * f);
     void clearFaceGeom();
