@@ -161,7 +161,7 @@ void GeometryObject::clear()
 void GeometryObject::projectShape(const TopoDS_Shape& input,
     const gp_Ax2 viewAxis)
 {
-    m_useFastHLR = true; //FORCE FOR TESTING!
+    //m_useFastHLR = true; //FORCE FOR TESTING!
     if (m_useFastHLR)
         return projectShapeWithPolygonAlgo(input, viewAxis);
 
@@ -279,7 +279,7 @@ void GeometryObject::projectShapeWithPolygonAlgo(const TopoDS_Shape& input,
         //brep_hlr->Hide();                        
     }
     catch (...) {
-        Standard_Failure::Raise("GeometryObject::projectShape - error occurred while projecting shape");
+        Standard_Failure::Raise("GeometryObject::projectShapeWithPolygonAlgo  - error occurred while projecting shape");
     }
     auto end = chrono::high_resolution_clock::now();
     auto diff = end - start;
