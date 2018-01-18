@@ -154,7 +154,7 @@ void GeometryObject::clear()
 
     vertexGeom.clear();
     faceGeom.clear();
-    edgeGeom.clear();
+    edgeGeom.clear(); 
 }
 
 //!set up a hidden line remover and project a shape with it
