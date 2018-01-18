@@ -477,7 +477,7 @@ void QGIViewPart::drawViewPart()
                                          GetGroup("Preferences")->GetGroup("Mod/TechDraw/General");
     double vertexScaleFactor = hGrp->GetFloat("VertexScale", 3.0);
 
-    bool useFastHLR = viewPart->FastHiddenLines.getValue();
+    bool useFastHLR = viewPart->FastDrawing.getValue();
     const std::vector<TechDrawGeometry::Vertex *> &verts = viewPart->getVertexGeometry();
     std::vector<TechDrawGeometry::Vertex *>::const_iterator vert = verts.begin();
     bool showCenters = viewPart->ArcCenterMarks.getValue();

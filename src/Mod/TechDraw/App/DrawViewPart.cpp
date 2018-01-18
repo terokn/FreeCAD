@@ -132,9 +132,9 @@ DrawViewPart::DrawViewPart(void) : geometryObject(0)
     ADD_PROPERTY_TYPE(Direction ,(0,0,1.0)    ,group,App::Prop_None,"Projection direction. The direction you are looking from.");
     ADD_PROPERTY_TYPE(Perspective ,(false),group,App::Prop_None,"Perspective(true) or Orthographic(false) projection");
     ADD_PROPERTY_TYPE(Focus,(defDist),group,App::Prop_None,"Perspective view focus distance");
-    ADD_PROPERTY_TYPE(FastHiddenLines, (false), group, App::Prop_None, "Faster Hidden line Algorithm on/off");
-
+    
     //properties that affect Appearance
+    ADD_PROPERTY_TYPE(FastDrawing, (false), sgroup, App::Prop_None, "Fast Drawing on/off");
     //visible outline
     ADD_PROPERTY_TYPE(SmoothVisible ,(false),sgroup,App::Prop_None,"Visible Smooth lines on/off");
     ADD_PROPERTY_TYPE(SeamVisible ,(false),sgroup,App::Prop_None,"Visible Seam lines on/off");
@@ -321,7 +321,7 @@ short DrawViewPart::mustExecute() const
 
 void DrawViewPart::onChanged(const App::Property* prop)
 {
-    //if (prop == &FastHiddenLines) // Is this correct to call super's OnChanged after this??
+    //if (prop == &FastDrawing) // Is this correct to call super's OnChanged after this??
     //    TechDraw::DrawView::mustExecute();
     //Base::Console().Message("FAST");
 
@@ -337,7 +337,7 @@ TechDrawGeometry::GeometryObject* DrawViewPart::buildGeometryObject(TopoDS_Shape
     go->setIsoCount(IsoCount.getValue());
     go->isPerspective(Perspective.getValue());
     go->setFocus(Focus.getValue());
-    go->useFastHLR(FastHiddenLines.getValue());
+    go->useFastHLR(FastDrawing.getValue());
 
     Base::Vector3d baseProjDir = Direction.getValue();
     saveParamSpace(baseProjDir);
