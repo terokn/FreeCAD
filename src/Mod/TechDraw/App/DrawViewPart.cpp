@@ -124,7 +124,7 @@ DrawViewPart::DrawViewPart(void) : geometryObject(0)
     Base::Reference<ParameterGrp> hGrp = App::GetApplication().GetUserParameter().GetGroup("BaseApp")->
                                                                GetGroup("Preferences")->GetGroup("Mod/TechDraw/General");
     double defDist = hGrp->GetFloat("FocusDistance",100.0);
-
+    bool fastDrawing = hGrp->GetBool("FastDrawing", false);
 
     //properties that affect Geometry
     ADD_PROPERTY_TYPE(Source ,(0),group,App::Prop_None,"3D Shape to view");
@@ -134,7 +134,7 @@ DrawViewPart::DrawViewPart(void) : geometryObject(0)
     ADD_PROPERTY_TYPE(Focus,(defDist),group,App::Prop_None,"Perspective view focus distance");
     
     //properties that affect Appearance
-    ADD_PROPERTY_TYPE(FastDrawing, (false), sgroup, App::Prop_None, "Fast Drawing on/off");
+    ADD_PROPERTY_TYPE(FastDrawing, (fastDrawing), sgroup, App::Prop_None, "Fast Drawing on/off");
     //visible outline
     ADD_PROPERTY_TYPE(SmoothVisible ,(false),sgroup,App::Prop_None,"Visible Smooth lines on/off");
     ADD_PROPERTY_TYPE(SeamVisible ,(false),sgroup,App::Prop_None,"Visible Seam lines on/off");

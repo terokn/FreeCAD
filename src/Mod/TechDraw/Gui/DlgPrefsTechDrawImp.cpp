@@ -49,6 +49,8 @@ void DlgPrefsTechDrawImp::saveSettings()
     cb_SectionEdges->onSave();
     cb_PageUpdate->onSave();
     dsb_TemplateDot->onSave();
+    cb_FastDrawing->onSave();
+    
 
     pcb_Normal->onSave();
     pcb_Select->onSave();
@@ -76,6 +78,7 @@ void DlgPrefsTechDrawImp::loadSettings()
     cb_SectionEdges->onRestore();
     cb_PageUpdate->onRestore();
     dsb_TemplateDot->onRestore();
+    cb_FastDrawing->onRestore();
 
     pcb_Normal->onRestore();
     pcb_Select->onRestore();

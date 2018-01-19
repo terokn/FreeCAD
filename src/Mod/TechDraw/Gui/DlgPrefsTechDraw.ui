@@ -159,14 +159,14 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="6" column="0">
          <widget class="QLabel" name="lbl_TemplateDot">
           <property name="text">
            <string>Template Dot Size</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="1">
+        <item row="6" column="1">
          <widget class="Gui::PrefDoubleSpinBox" name="dsb_TemplateDot">
           <property name="toolTip">
            <string>EditableText Dot Size in mm</string>
@@ -179,6 +179,19 @@
           </property>
           <property name="prefPath" stdset="0">
            <cstring>/Mod/TechDraw/General</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="Gui::PrefCheckBox" name="cb_FastDrawing">
+          <property name="text">
+           <string>Fast Drawing</string>
+          </property>
+          <property name="prefEntry" stdset="0">
+           <string>FastDrawing</string>
+          </property>
+          <property name="prefPath" stdset="0">
+           <string>Mod/TechDraw/General</string>
           </property>
          </widget>
         </item>
@@ -208,6 +221,19 @@
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <item>
        <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="5">
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
         <item row="2" column="4">
          <widget class="QLabel" name="label_5">
           <property name="text">
@@ -219,47 +245,6 @@
          <widget class="QLabel" name="label_3">
           <property name="text">
            <string>Section Face</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="Gui::PrefColorButton" name="pcb_Background">
-          <property name="color">
-           <color>
-            <red>80</red>
-            <green>80</green>
-            <blue>80</blue>
-           </color>
-          </property>
-          <property name="prefEntry" stdset="0">
-           <cstring>Background</cstring>
-          </property>
-          <property name="prefPath" stdset="0">
-           <cstring>/Mod/TechDraw/Colors</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="Gui::PrefColorButton" name="pcb_PreSelect">
-          <property name="color">
-           <color>
-            <red>255</red>
-            <green>255</green>
-            <blue>20</blue>
-           </color>
-          </property>
-          <property name="prefEntry" stdset="0">
-           <cstring>PreSelectColor</cstring>
-          </property>
-          <property name="prefPath" stdset="0">
-           <cstring>Mod/TechDraw/Colors</cstring>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="lbl_Normal">
-          <property name="text">
-           <string>Normal</string>
           </property>
          </widget>
         </item>
@@ -288,7 +273,7 @@
         </item>
         <item row="2" column="2">
          <widget class="Gui::PrefColorButton" name="pcb_Select">
-          <property name="color">
+          <property name="color" stdset="0">
            <color>
             <red>28</red>
             <green>173</green>
@@ -303,30 +288,24 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="5">
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item row="0" column="0">
+         <widget class="QLabel" name="lbl_Normal">
+          <property name="text">
+           <string>Normal</string>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
+         </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="Gui::PrefColorButton" name="pcb_Normal">
-          <property name="color">
+        <item row="1" column="2">
+         <widget class="Gui::PrefColorButton" name="pcb_PreSelect">
+          <property name="color" stdset="0">
            <color>
-            <red>0</red>
-            <green>0</green>
-            <blue>0</blue>
+            <red>255</red>
+            <green>255</green>
+            <blue>20</blue>
            </color>
           </property>
           <property name="prefEntry" stdset="0">
-           <cstring>NormalColor</cstring>
+           <cstring>PreSelectColor</cstring>
           </property>
           <property name="prefPath" stdset="0">
            <cstring>Mod/TechDraw/Colors</cstring>
@@ -346,10 +325,44 @@
           </property>
          </spacer>
         </item>
+        <item row="0" column="2">
+         <widget class="Gui::PrefColorButton" name="pcb_Normal">
+          <property name="color" stdset="0">
+           <color>
+            <red>0</red>
+            <green>0</green>
+            <blue>0</blue>
+           </color>
+          </property>
+          <property name="prefEntry" stdset="0">
+           <cstring>NormalColor</cstring>
+          </property>
+          <property name="prefPath" stdset="0">
+           <cstring>Mod/TechDraw/Colors</cstring>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="lbl_PreSelect">
           <property name="text">
            <string>PreSelected</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="Gui::PrefColorButton" name="pcb_Background">
+          <property name="color" stdset="0">
+           <color>
+            <red>80</red>
+            <green>80</green>
+            <blue>80</blue>
+           </color>
+          </property>
+          <property name="prefEntry" stdset="0">
+           <cstring>Background</cstring>
+          </property>
+          <property name="prefPath" stdset="0">
+           <cstring>/Mod/TechDraw/Colors</cstring>
           </property>
          </widget>
         </item>
@@ -360,20 +373,10 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="6">
-         <widget class="Gui::PrefColorButton" name="pcb_Surface">
-          <property name="color">
-           <color>
-            <red>225</red>
-            <green>225</green>
-            <blue>225</blue>
-           </color>
-          </property>
-          <property name="prefEntry" stdset="0">
-           <cstring>CutSurfaceColor</cstring>
-          </property>
-          <property name="prefPath" stdset="0">
-           <cstring>Mod/TechDraw/Colors</cstring>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>Background</string>
           </property>
          </widget>
         </item>
@@ -386,7 +389,7 @@
         </item>
         <item row="2" column="6">
          <widget class="Gui::PrefColorButton" name="pcb_Hatch">
-          <property name="color">
+          <property name="color" stdset="0">
            <color>
             <red>0</red>
             <green>0</green>
@@ -401,23 +404,9 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>Background</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="4">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Geom Hatch</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="6">
          <widget class="Gui::PrefColorButton" name="colorButton">
-          <property name="color">
+          <property name="color" stdset="0">
            <color>
             <red>0</red>
             <green>0</green>
@@ -429,6 +418,30 @@
           </property>
           <property name="prefPath" stdset="0">
            <cstring>/Mod/TechDraw/Colors</cstring>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QLabel" name="label_7">
+          <property name="text">
+           <string>Geom Hatch</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="6">
+         <widget class="Gui::PrefColorButton" name="pcb_Surface">
+          <property name="color" stdset="0">
+           <color>
+            <red>225</red>
+            <green>225</green>
+            <blue>225</blue>
+           </color>
+          </property>
+          <property name="prefEntry" stdset="0">
+           <cstring>CutSurfaceColor</cstring>
+          </property>
+          <property name="prefPath" stdset="0">
+           <cstring>Mod/TechDraw/Colors</cstring>
           </property>
          </widget>
         </item>
@@ -473,10 +486,7 @@
          </widget>
         </item>
         <item row="1" column="1">
-         <widget class="Gui::PrefFileChooser" name="pfc_DefDir">
-          <property name="mode">
-           <enum>Gui::FileChooser::Directory</enum>
-          </property>
+         <widget class="Gui::PrefFileChooser" name="pfc_DefDir" native="true">
           <property name="prefEntry" stdset="0">
            <cstring>TemplateDir</cstring>
           </property>
@@ -493,7 +503,7 @@
          </widget>
         </item>
         <item row="0" column="1">
-         <widget class="Gui::PrefFileChooser" name="pfc_DefTemp">
+         <widget class="Gui::PrefFileChooser" name="pfc_DefTemp" native="true">
           <property name="prefEntry" stdset="0">
            <cstring>TemplateFile</cstring>
           </property>
@@ -503,7 +513,7 @@
          </widget>
         </item>
         <item row="2" column="1">
-         <widget class="Gui::PrefFileChooser" name="pfc_HatchFile">
+         <widget class="Gui::PrefFileChooser" name="pfc_HatchFile" native="true">
           <property name="toolTip">
            <string>Location of default svg/png fill file</string>
           </property>
@@ -523,7 +533,7 @@
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="Gui::PrefFileChooser" name="pfc_FilePattern">
+         <widget class="Gui::PrefFileChooser" name="pfc_FilePattern" native="true">
           <property name="toolTip">
            <string>Default location for PAT file</string>
           </property>
