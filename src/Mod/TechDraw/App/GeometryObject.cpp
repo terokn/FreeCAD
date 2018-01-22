@@ -263,7 +263,7 @@ void GeometryObject::projectShapeWithPolygonAlgo(const TopoDS_Shape& input,
     Base::Console().Log("TIMING - %s GO spent: %.3f millisecs in HLRBRep_PolyAlgo & co\n", m_parentName.c_str(), diffOut);
 
     try {
-        HLRBRep_PolyHLRToShape polyhlrToShape = HLRBRep_PolyHLRToShape();
+        HLRBRep_PolyHLRToShape polyhlrToShape;
         polyhlrToShape.Update(brep_hlrPoly);
 
         visHard = polyhlrToShape.VCompound();
